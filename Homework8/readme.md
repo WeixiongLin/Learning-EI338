@@ -19,7 +19,7 @@
 
 
 ## 项目结构
-
+```
 Homework8/
     |--.vscode/: vscode config
     |--bin/: executable files
@@ -29,3 +29,4 @@ Homework8/
     |--gongchen.cpp: Gongchen's solution on Window OS
     |--openMP_hello.cpp: testing use of openMP
     |--README.md
+```
