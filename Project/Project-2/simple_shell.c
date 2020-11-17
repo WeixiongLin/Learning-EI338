@@ -136,25 +136,32 @@ int check_ampersand(char **args, size_t *size) {
  *   output_file: file name for output
  *   returns: IO flag (bit 1 for output, bit 0 for input)
  */
-unsigned check_redirection(char **args, size_t *size, char **input_file, char **output_file) {
+unsigned check_redirection(char **args, size_t *size, char **input_file, char **output_file)
+{
     unsigned flag = 0;
     size_t to_remove[4], remove_cnt = 0;
-    for(size_t i = 0; i != *size; ++i) {
-        if(remove_cnt >= 4) {
+    for(size_t i = 0; i != *size; ++i)
+    {
+        if(remove_cnt >= 4)
             break;
-        }
-        if(strcmp("<", args[i]) == 0) {     // input
+        if(strcmp("<", args[i]) == 0)
+        {
+            // input
             to_remove[remove_cnt++] = i;
-            if(i == (*size) - 1) {
+            if(i == (*size) - 1)
+            {
                 fprintf(stderr, "No input file provided!\n");
                 break;
             }
             flag |= 1;
             *input_file = args[i + 1];
             to_remove[remove_cnt++] = ++i;
-        } else if(strcmp(">", args[i]) == 0) {   // output
+        } else if(strcmp(">", args[i]) == 0)
+        {
+            // output
             to_remove[remove_cnt++] = i;
-            if(i == (*size) - 1) {
+            if(i == (*size) - 1)
+            {
                 fprintf(stderr, "No output file provided!\n");
                 break;
             }
@@ -164,10 +171,12 @@ unsigned check_redirection(char **args, size_t *size, char **input_file, char **
         }
     }
     /* Remove I/O indicators and filenames from arguments */
-    for(int i = remove_cnt - 1; i >= 0; --i) {
+    for(int i = remove_cnt - 1; i >= 0; --i)
+    {
         size_t pos = to_remove[i];  // the index of arg to remove
         // printf("%lu %s\n", pos, args[pos]);
-        while(pos != *size) {
+        while(pos != *size)
+        {
             args[pos] = args[pos + 1];
             ++pos;
         }
@@ -186,20 +195,27 @@ unsigned check_redirection(char **args, size_t *size, char **input_file, char **
  *   output_decs: file descriptor of output file
  *   returns: success or not
  */
-int redirect_io(unsigned io_flag, char *input_file, char *output_file, int *input_desc, int *output_desc) {
+int redirect_io(unsigned io_flag, char *input_file, char *output_file, int *input_desc, int *output_desc)
+{
     // printf("IO flag: %u\n", io_flag);
-    if(io_flag & 2) {  // redirecting output
+    if(io_flag & 2)
+    {
+        // redirecting output
         *output_desc = open(output_file, O_WRONLY | O_CREAT | O_TRUNC, 644);
-        if(*output_desc < 0) {
+        if(*output_desc < 0)
+        {
             fprintf(stderr, "Failed to open the output file: %s\n", output_file);
             return 0;
         }
         // printf("Output To: %s %d\n", output_file, *output_desc);
         dup2(*output_desc, STDOUT_FILENO);
     }
-    if(io_flag & 1) { // redirecting input
+    if(io_flag & 1)
+    {
+        // redirecting input
         *input_desc = open(input_file, O_RDONLY, 0644);
-        if(*input_desc < 0) {
+        if(*input_desc < 0)
+        {
             fprintf(stderr, "Failed to open the input file: %s\n", input_file);
             return 0;
         }
@@ -217,13 +233,12 @@ int redirect_io(unsigned io_flag, char *input_file, char *output_file, int *inpu
  *   output_decs: file descriptor of output file
  *   returns: void
  */
-void close_file(unsigned io_flag, int input_desc, int output_desc) {
-    if(io_flag & 2) {
+void close_file(unsigned io_flag, int input_desc, int output_desc)
+{
+    if(io_flag & 2)
         close(output_desc);
-    }
-    if(io_flag & 1) {
+    if(io_flag & 1)
         close(input_desc);
-    }
 }
 
 /*
@@ -238,9 +253,12 @@ void close_file(unsigned io_flag, int input_desc, int output_desc) {
  *
  *   returns: void
  */
-void detect_pipe(char **args, size_t *args_num, char ***args2, size_t *args_num2) {
-    for(size_t i = 0; i != *args_num; ++i) {
-        if (strcmp(args[i], "|") == 0) {
+void detect_pipe(char **args, size_t *args_num, char ***args2, size_t *args_num2)
+{
+    for(size_t i = 0; i != *args_num; ++i)
+    {
+        if (strcmp(args[i], "|") == 0)
+        {
             free(args[i]);
             args[i] = NULL;
             *args_num2 = *args_num -  i - 1;
@@ -258,7 +276,8 @@ void detect_pipe(char **args, size_t *args_num, char ***args2, size_t *args_num2
  *   args_num: number of arguments
  *   returns: success or not
  */
-int run_command(char **args, size_t args_num) {
+int run_command(char **args, size_t args_num)
+{
     /* Detect '&' to determine whether to run concurrently */
     int run_concurrently = check_ampersand(args, &args_num);
     /* Detect pipe */
@@ -267,25 +286,32 @@ int run_command(char **args, size_t args_num) {
     detect_pipe(args, &args_num, &args2, &args_num2);
     /* Create a child process and execute the command */
     pid_t pid = fork();
-    if(pid < 0) {   // fork failed
+    if(pid < 0)
+    {   
+        // fork failed
         fprintf(stderr, "Failed to fork!\n");
         return 0;
-    } else if (pid == 0) { // child process
-        if(args_num2 != 0) {    // pipe
+    } else if (pid == 0)
+    {
+        // child process
+        if(args_num2 != 0)
+        {
+            // pipe
             /* Create pipe */
             int fd[2];
             pipe(fd);
             /* Fork into another two processes */
             pid_t pid2 = fork();
-            if(pid2 > 0) {  // child process for the second command
+            if(pid2 > 0)
+            {
+                // child process for the second command
                 /* Redirect I/O */
                 char *input_file, *output_file;
                 int input_desc, output_desc;
                 unsigned io_flag = check_redirection(args2, &args_num2, &input_file, &output_file);    // bit 1 for output, bit 0 for input
                 io_flag &= 2;   // disable input redirection
-                if(redirect_io(io_flag, input_file, output_file, &input_desc, &output_desc) == 0) {
+                if(redirect_io(io_flag, input_file, output_file, &input_desc, &output_desc) == 0)
                     return 0;
-                }
                 close(fd[1]);
                 dup2(fd[0], STDIN_FILENO);
                 wait(NULL);     // wait for the first command to finish
@@ -293,13 +319,16 @@ int run_command(char **args, size_t args_num) {
                 close_file(io_flag, input_desc, output_desc);
                 close(fd[0]);
                 fflush(stdin);
-            } else if(pid2 == 0) {  // grandchild process for the first command
+            } else if(pid2 == 0)
+            {
+                // grandchild process for the first command
                 /* Redirect I/O */
                 char *input_file, *output_file;
                 int input_desc, output_desc;
                 unsigned io_flag = check_redirection(args, &args_num, &input_file, &output_file);    // bit 1 for output, bit 0 for input
                 io_flag &= 1;   // disable output redirection
-                if(redirect_io(io_flag, input_file, output_file, &input_desc, &output_desc) == 0) {
+                if(redirect_io(io_flag, input_file, output_file, &input_desc, &output_desc) == 0)
+                {
                     return 0;
                 }
                 close(fd[0]);
@@ -309,50 +338,57 @@ int run_command(char **args, size_t args_num) {
                 close(fd[1]);
                 fflush(stdin);
             }
-        } else {    // no pipe
+        } else
+        {
+            // no pipe
             /* Redirect I/O */
             char *input_file, *output_file;
             int input_desc, output_desc;
             unsigned io_flag = check_redirection(args, &args_num, &input_file, &output_file);    // bit 1 for output, bit 0 for input
-            if(redirect_io(io_flag, input_file, output_file, &input_desc, &output_desc) == 0) {
+            if(redirect_io(io_flag, input_file, output_file, &input_desc, &output_desc) == 0)
                 return 0;
-            }
             execvp(args[0], args);
             close_file(io_flag, input_desc, output_desc);
             fflush(stdin);
         }
-    } else { // parent process
-        if(!run_concurrently) { // parent and child run concurrently
+    } else
+    {
+        // parent process
+        if(!run_concurrently)
+        {
+            // parent and child run concurrently
             wait(NULL);
         }
     }
     return 1;
 }
 
-int main(void) {
+int main(void)
+{
     char *args[MAX_LINE / 2 + 1]; /* command line (of 80) has max of 40 arguments */
     char command[MAX_LINE + 1];
     init_args(args);
     init_command(command);
-    while (1) {
+    while (1)
+    {
         printf("osh>");
         fflush(stdout);
         fflush(stdin);
         /* Make args empty before parsing */
         refresh_args(args);
         /* Get input and parse it */
-        if(!get_input(command)) {
+        if(!get_input(command))
             continue;
-        }
         size_t args_num = parse_input(args, command);
         /* Continue or exit */
-        if(args_num == 0) { // empty input
+        if(args_num == 0)
+        {
+            // empty input
             printf("Please enter the command! (or type \"exit\" to exit)\n");
             continue;
         }
-        if(strcmp(args[0], "exit") == 0) {
+        if(strcmp(args[0], "exit") == 0)
             break;
-        }
         /* Run command */
         run_command(args, args_num);
     }

@@ -18,6 +18,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/wait.h>
 
 #define MAX_LINE 80 /* The maximum length command*/
 #define DELIMITERS " \t\n\v\f\r"
@@ -93,6 +94,35 @@ size_t parse_input(char *args[], char *original_command)
     return num;
 }
 
+/**
+ * @brief  如果命令中包含 | 表示使用 pipe
+ * @param  args
+ * @param  args_num
+ * @param  args2
+ * @param  args_num2
+ */
+void detect_pipe(char **args, size_t *args_num, char ***args2, size_t *args_num2)
+{
+    for(size_t i = 0; i != *args_num; ++i)
+    {
+        if (strcmp(args[i], "|") == 0)
+        {
+            free(args[i]);
+            args[i] = NULL;
+            *args_num2 = *args_num -  i - 1;
+            *args_num = i;
+            *args2 = args + i + 1;
+            break;
+        }
+    }
+}
+
+
+/**
+ * @brief run command
+ * @param  args
+ * @param  args_num
+ */
 void run_command(char *args[], size_t args_num)
 {
     /* 创建进程 */
@@ -103,6 +133,9 @@ void run_command(char *args[], size_t args_num)
     } else if(pid == 0)  // child process
     {
         execvp(args[0], args);
+    } else  // parent process
+    {
+        wait(NULL);
     }
 }
 
