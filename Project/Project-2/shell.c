@@ -1,5 +1,23 @@
+/**
+ * @file shell.c
+ * @brief 
+ * @author WeixiongLin (wx_lin@outlook.com)
+ * @version 1.0
+ * @date 2020-11-17
+ * 
+ * @copyright Copyright (c) 2020  WeixiongLin
+ * 
+ * @par 修改日志:
+ * <table>
+ * <tr><th>Date       <th>Version <th>Author  <th>Description
+ * <tr><td>2020-11-17 <td>1.0     <td>WeixiongLin     <td>内容
+ * </table>
+ */
+
 #include <stdio.h>
 #include <unistd.h>
+#include <stdlib.h>
+#include <string.h>
 
 #define MAX_LINE 80 /* The maximum length command*/
 #define DELIMITERS " \t\n\v\f\r"
@@ -9,11 +27,9 @@
  * @brief 清空 args
  * @param  args             My Param doc
  */
-void refresh_args(char *args[])
-{
-    while (*args)
-    {
-        free(*args);  // avoid memory leak
+void refresh_args(char *args[]) {
+    while(*args) {
+        free(*args);  // to avoid memory leaks
         *args++ = NULL;
     }
 }
@@ -35,7 +51,7 @@ int get_input(char *command)
     {
         if(strlen(command) == 0)
         {
-            sprintf(stderr, "No command history");
+            fprintf(stderr, "No command history");
             return 0;
         }
         return 1;
@@ -51,7 +67,7 @@ int get_input(char *command)
  * @param  original_command
  * @return num of tokens
  */
-size_t parse_input(char *args, char *original_command)
+size_t parse_input(char *args[], char *original_command)
 {
     size_t num = 0;
     char command[MAX_LINE + 1];
@@ -64,7 +80,7 @@ size_t parse_input(char *args, char *original_command)
         num++;
         token = strtok(NULL, DELIMITERS);
     }
-    return 0;    
+    return 0;
 }
 
 void run_command()
