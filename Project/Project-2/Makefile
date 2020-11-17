@@ -1,5 +1,6 @@
-obj-m += shell.o
-all:
-	make -C /lib/modules/$(shell uname -r)/build M=$(PWD) modules
+simple_shell: simple_shell.o
+	gcc -o simple_shell simple_shell.o
+simple_shell.o: simple_shell.c
+	gcc -c simple_shell.c
 clean:
-	make -C /lib/modules/$(shell uname -r)/build M=$(PWD) clean
+	rm simple_shell simple_shell.o

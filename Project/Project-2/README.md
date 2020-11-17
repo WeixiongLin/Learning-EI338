@@ -49,5 +49,35 @@ parent process 创建 process 执行 `ls -l`, 它也创建自己的 child proces
 并用 pipe 进行连接.
 
 
+#### 代码赏析
+1. Memory Leak
+    吴学长的程序设计考虑了很多 mem leak 的情况, 这是很好的.
+    因为我们是一个无限循环的过程, 如果不把
+
+2. size_t 与 int
+吴学长或是处于对兼容性的考虑(预见到会有其他人参考他的代码), 使用的是 `size_t` 而不是 int.
+因为 `size_t` 的定义如下, 直接使用 `int` 有可能面临空间不够/浪费的问题.
+
+32 bit 架构中的定义为:
+```c
+typedef  unsigned int size_t;
+```
+64 bit 架构中的定义为:
+```c
+typedef  unsigned long size_t;
+```
+
+3. strtok
+这相当于 `python` 里面的 `split` 函数, 我本来自己手搓一个出来.
+说明我对 `c++` 的认识还是太浅了, 可能 `python` 有的特性 `c++` 也已经具备了.
+
+4. 宏
+
+```c
+#define DELIMITERS " \t\n\v\f\r"
+
+token = strtok(NULL, DELIMITERS);
+```
+
 ## Linux Kernel Module for Task Information
 
