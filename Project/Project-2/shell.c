@@ -24,6 +24,16 @@
 
 
 /**
+ * @brief 
+ * @param  args
+ */
+void init_args(char *args[]) {
+    for(size_t i = 0; i != MAX_LINE / 2 + 1; ++i) {
+        args[i] = NULL;
+    }
+}
+
+/**
  * @brief 清空 args
  * @param  args             My Param doc
  */
@@ -80,27 +90,34 @@ size_t parse_input(char *args[], char *original_command)
         num++;
         token = strtok(NULL, DELIMITERS);
     }
-    return 0;
+    return num;
 }
 
-void run_command()
+void run_command(char *args[], size_t args_num)
 {
-    printf("run command");
+    /* 创建进程 */
+    pid_t pid = fork();
+    if(pid < 0)
+    {
+        fprintf(stderr, "Failed to fork!\n");
+    } else if(pid == 0)  // child process
+    {
+        execvp(args[0], args);
+    }
 }
 
 
 int main(void)
 {
     char *args[MAX_LINE/2 + 1]; /* command line arguments */
-    int should_run = 1; /*flag to determine whether to exit the program*/
     char command[MAX_LINE + 1]; /* raw command*/
 
-    while (should_run)
+    while (1)
     {
         printf("osh>");
         fflush(stdin);
         fflush(stdout); /* 清空输出缓存 */
-        // 清空 args
+        init_args(args);
         refresh_args(args);
 
         /**
@@ -126,7 +143,7 @@ int main(void)
             break;
         
         /* run command */
-        run_command();
+        run_command(args, args_num);
     }
     return 0;
 }
