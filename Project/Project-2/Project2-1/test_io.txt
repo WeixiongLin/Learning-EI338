@@ -1,0 +1,8 @@
+Makefile
+shell
+shell.c
+shell.o
+simple_shell
+simple_shell.c
+simple_shell.o
+test_io.txt

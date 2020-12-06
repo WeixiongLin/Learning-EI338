@@ -1,0 +1,1 @@
+cmd_/root/Learning-EI338/Project/Project-2/Project2-2/pid_module.ko := ld -r -m elf_x86_64  -z max-page-size=0x200000 -T ./scripts/module-common.lds  --build-id  -o /root/Learning-EI338/Project/Project-2/Project2-2/pid_module.ko /root/Learning-EI338/Project/Project-2/Project2-2/pid_module.o /root/Learning-EI338/Project/Project-2/Project2-2/pid_module.mod.o ;  true

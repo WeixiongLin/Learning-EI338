@@ -5,6 +5,7 @@ Implementation of a shell interface with C program. It accepts commands and run 
 然后羞愧难当, 就把自己写的删了. 差距体现在两个方面:
 1. 程序结构: 和 keithnull 结构还是不够清晰
 2. 鲁棒性: 很多细节没考虑, 比如用户可能输入 `!!&*@`, 这时候就应该用 `strncmp` 而不是 `strcmp` (指定要毕竟前两位)
+    我的程序只能接收非常有限的操作, 非常可笑.
 
 
 ## Unix Shell
@@ -79,5 +80,53 @@ typedef  unsigned long size_t;
 token = strtok(NULL, DELIMITERS);
 ```
 
+### 测试指令
+```
+make
+./shell
+
+ls -a
+!!
+ls > test_io.txt
+sort < test_io.txt
+ls -al | sort
+cat < test_io.txt | sort > test_io_sorted.txt
+cat test_io_sorted.txt
+
+exit
+```
+
+
 ## Linux Kernel Module for Task Information
 
+利用  `/proc` 和  `pid` 的信息展示某个进程的信息.
+将 `pid` 写入 `/proc/pid`, 之后读的时候输出:
+1. command
+2. pid
+3. state
+
+### Writing to the `/proc` File System
+调用 `proc_write` 程序, 将 `pid` 写入 `/proc`.
+1. `kmalloc` 分配内存
+2. `copy_from_user` 将 `user_buffer` 中的内容 copy 到 `buffer` 中.
+3. `kfree` 释放内存
+
+### Reading from the `/proc` File System
+之后每当我们从 `proc/pid` 中读取, 会返回 `command, pid, state`.
+
+
+### 测试指令
+```
+make
+sudo insmod pid_module.ko
+echo 1 > /proc/pid
+cat /proc/pid
+
+
+echo 67832 > /proc/pid
+cat /proc/pid
+
+sudo rmmod pid_module
+```
+
+其中 pid 的值可以通过 `top` 指令进行寻找
