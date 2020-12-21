@@ -1,4 +1,4 @@
-# Project 6: Banker's Algorithm
+# Project 3: Banker's Algorithm
 
 Banker's Algorithm. (Operating System Concepts, 10th Edition, Chapter 8)
 
