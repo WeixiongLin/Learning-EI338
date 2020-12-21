@@ -1,4 +1,4 @@
-# Project 7: Contiguous Memory Allocation
+# Project 4: Contiguous Memory Allocation
 
 Contiguous Memory Allocation. (Operating System Concepts, 10th Edition, Chapter 9)
 
@@ -9,11 +9,6 @@ This project will involve managing a contiguous region of memory of size `MAX` a
 2. Release of a contiguous block of memory
 3. Compact unused holes of memory into one single block
 4. Report the regions of free and allocated memory
-
-## Environment
-
-- OS: Ubuntu 18.04 (Linux kernel version: 5.3.5)
-- Compiler: GCC 7.4.0
 
 ## Basic Ideas
 
@@ -226,7 +221,3 @@ allocator> STAT
 =============================================================
 allocator> 
 ```
-
-And the screenshot:
-
-![screenshot](./screenshot.png)

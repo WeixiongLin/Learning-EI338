@@ -28,9 +28,17 @@ typedef struct MemBlock {
 } MemBlock;
 
 size_t mem_size = 0;
-MemBlock *mem;
+MemBlock *mem; // First block in mem
 
-
+/**
+ * @brief Geneate new memblock.
+ * @param  lo               Low address of memblock
+ * @param  hi               High address of memblock
+ * @param  name             Name of the process
+ * @param  prev             Pointer to previous memblock
+ * @param  next             Pointer to next memblock
+ * @return MemBlock*        Pointer to current memblock
+ */
 MemBlock *make_block(size_t lo, size_t hi, const char *name, MemBlock *prev, MemBlock *next) {
     MemBlock *ret = malloc(sizeof(MemBlock));
     if(ret == NULL) {
@@ -56,6 +64,13 @@ MemBlock *make_block(size_t lo, size_t hi, const char *name, MemBlock *prev, Mem
     return ret;
 }
 
+/**
+ * @brief Find mem to allocate for process.
+ * @param  name             Process name
+ * @param  size             Size of requested mem
+ * @param  strategy         First-fit, Best-fit, Worst-fit
+ * @return int 
+ */
 int request_memory(const char *name, size_t size, char strategy) {
     MemBlock *hole = NULL;
     // select the hole
@@ -115,7 +130,11 @@ int request_memory(const char *name, size_t size, char strategy) {
     return 0;
 }
 
-// release all blocks with the given name, and do the merges if possible
+/**
+ * @brief Release all blocks with the given name, and do the merges if possible
+ * @param  name             Name of process
+ * @return int 
+ */
 int release_memory(const char *name) {
     MemBlock *cursor = mem;
     int flag = 1;
@@ -147,6 +166,9 @@ int release_memory(const char *name) {
     return flag;
 }
 
+/**
+ * @brief Gather used block together, merge used blocks.
+ */
 void compact_memory() {
     MemBlock *cursor = mem;
     while(cursor) {
@@ -185,6 +207,9 @@ void release_wrapper() {
     printf(release_memory(name) ? "FAILURE\n" : "SUCCESS\n");
 }
 
+/**
+ * @brief Usage cue.
+ */
 void display_usage() {
     printf("=============================================================\n");
     printf("<this program> <memory size (in bytes)>\n");
@@ -203,6 +228,9 @@ void display_usage() {
     printf("=============================================================\n");
 }
 
+/**
+ * @brief Display mem blocks in the memmory.
+ */
 void display_memory() {
     printf("=============================================================\n");
     MemBlock *cursor = mem;
@@ -218,6 +246,12 @@ void display_memory() {
     printf("=============================================================\n");
 }
 
+/**
+ * @brief Set size of memory.
+ * @param  argc             Num of parameters
+ * @param  argv             argv[1] mem_size
+ * @return int 
+ */
 int init(int argc, char **argv) {
     if(argc != 2) {
         printf("Incorrect number of arguments.\n");
@@ -229,6 +263,9 @@ int init(int argc, char **argv) {
     return 0;
 }
 
+/**
+ * @brief Free all memblocks in the memory.
+ */
 void clean_up() {
     MemBlock *temp = mem;
     while(mem) {
@@ -239,6 +276,13 @@ void clean_up() {
     }
 }
 
+
+/**
+ * @brief 
+ * @param  argc             Num of arguments
+ * @param  argv             argv[1] mem_size
+ * @return int 
+ */
 int main(int argc, char **argv) {
     if(init(argc, argv) != 0) {
         display_usage();
